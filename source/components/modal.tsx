@@ -1,9 +1,51 @@
-import { Modal, StyleSheet, Text, View } from 'react-native';
-import { widthPercentageToDP } from 'react-native-responsive-screen';
+import React, { ReactNode, createContext, useContext, useState } from 'react';
+import { Modal as RNModal, Text, View } from 'react-native';
 import CustomButton from './CustomButton';
-import { useState } from 'react';
-
-export const AlertModal = () => {
+import { ModalContext_Style } from './modelstyle';
+ 
+interface ModalContextType {
+    modalOpen: boolean;
+    modalContent: string;
+    openModal: (content: string) => void;
+    closeModal: () => void;
+}
+ 
+export const ModalContext = createContext<ModalContextType | undefined>(undefined);
+ 
+export function useModalContext() {
+    return useContext(ModalContext);
+}
+ 
+function Modal() {
+    const modalContext = useContext(ModalContext);
+ 
+    if (!modalContext) {
+        return null;
+    }
+ 
+    const { modalOpen, closeModal, modalContent } = modalContext;
+ 
+    if (!modalOpen) {
+        return null;
+    }
+ 
+    return (
+        <RNModal animationType="slide" transparent={true} visible={modalOpen}>
+            <View style={ModalContext_Style.modalViewParent}>
+                <View style={ModalContext_Style.modalCard}>
+                    <Text style={ModalContext_Style.textStyle}>{modalContent}</Text>
+                    <CustomButton style={ModalContext_Style.okButton} textstyle={ModalContext_Style.okTextStyle} label={"Ok"} onPress={closeModal} />
+                </View>
+            </View>
+        </RNModal>
+    );
+}
+ 
+interface ModalProviderProps {
+    children: ReactNode;
+}
+ 
+export function ModalProvider({ children }: ModalProviderProps) {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalContent, setModalContent] = useState('');
  
@@ -16,66 +58,18 @@ export const AlertModal = () => {
         setModalOpen(false);
         setModalContent('');
     };
-
+ 
+    const contextValue: ModalContextType = {
+        modalOpen,
+        modalContent,
+        openModal,
+        closeModal,
+    };
+ 
     return (
-        <Modal animationType="slide" transparent={true} visible={modalOpen}>
-            <View style={ModalContext_Style.modalViewParent}>
-                <View style={ModalContext_Style.modalCard}>
-                    <Text style={ModalContext_Style.textStyle}>{modalContent}</Text>
-                    <CustomButton style={ModalContext_Style.okButton} textstyle={ModalContext_Style.okTextStyle} label={"Ok"} onPress={closeModal} />
-                </View>
-            </View>
-        </Modal>
+        <ModalContext.Provider value={contextValue}>
+            {children}
+            <Modal />
+        </ModalContext.Provider>
     );
 }
-
-
-
-
-
-
-
-
-export const ModalContext_Style = StyleSheet.create({
-    modalViewParent: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    modalCard: {
-        paddingTop: 20,
-        shadowColor: 'grey',
-        shadowOffset: { width: 0, height: 0.5 },
-        shadowOpacity: 0.6,
-        borderRadius: 6,
-        backgroundColor: '#GHFGFF',
-        elevation: 8,
-        marginHorizontal: 15,
-        paddingHorizontal: 15,
-        borderColor: '#f12463',
-        borderWidth: 1,
-        paddingBottom: 15,
-        width: widthPercentageToDP(80)
-    },
-    textStyle: {
-        alignSelf: 'center',
-        color: '#000',
-        fontSize: 15,
-        fontWeight: '400',
-    },
-    okButton: {
-        borderRadius: 10,
-        marginHorizontal: 20,
-        height: 40,
-        alignSelf: 'center',
-        width: widthPercentageToDP(40),
-        marginTop: 20
-    },
-    okTextStyle: {
-        fontSize: 18,
-        color: '#FFF',
-        textAlign: 'center',
-        lineHeight: 30,
-        // fontFamily: WorkSansBlack
-    },
-})

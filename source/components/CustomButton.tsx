@@ -1,5 +1,6 @@
 import React from 'react';
 import { Pressable, ActivityIndicator, Text, StyleSheet } from 'react-native';
+import { BLACK, WHITE } from '../constant/Color';
 
 const CustomButton = (props: any) => {
     const { label, isLoader, onPress, disabled, style, textstyle, color } = props;
@@ -14,14 +15,14 @@ const CustomButton = (props: any) => {
         <Pressable
             disabled={disabled || isLoader}
             onPress={handlePress}
-            style={{ ...buttonCommonStyle.buttonStyle, ...(disabled ? buttonCommonStyle.disabledStyle : {}), ...style, }}
+            style={({ pressed }) => [buttonCommonStyle.buttonStyle, (disabled ? buttonCommonStyle.disabledStyle : ''), style, { opacity: pressed ? 0.2 : 1 }]}
         >
             {!isLoader ? (
                 <Text style={{ ...buttonCommonStyle.buttonText, ...textstyle }}>
                     {label}
                 </Text>
             ) : (
-                <ActivityIndicator color={color ? color : '#FFF'} />
+                <ActivityIndicator color={color ? color : WHITE} />
             )}
         </Pressable>
     );
@@ -32,7 +33,7 @@ export default CustomButton;
 export const buttonCommonStyle = StyleSheet.create({
     buttonStyle: {
         borderRadius: 9,
-        backgroundColor: "#000",
+        backgroundColor: BLACK,
         justifyContent: 'center',
         alignItems: 'center',
         flexDirection: "row",
@@ -41,7 +42,7 @@ export const buttonCommonStyle = StyleSheet.create({
         marginHorizontal: 20,
     },
     buttonText: {
-        color: "#FFF",
+        color: WHITE,
         fontSize: 18,
         alignSelf: 'center',
         lineHeight: 30
