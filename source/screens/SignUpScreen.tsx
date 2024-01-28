@@ -129,7 +129,7 @@ const SignUpScreen = ({ navigation }: any) => {
             setIsLoader(false)
             return
         }
-        const isDuplicate = registerUserData.some((item: any) => item.email == formValue?.email)
+        const isDuplicate = registerUserData.some((item: any) => item.email == formValue?.email && item.phonenumber == formValue?.phonenumber)
         if (isDuplicate) {
             openModal('Email/Mobile Number already Exist, Use other Email/Mobile number')
             setIsLoader(false)
